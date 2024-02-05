@@ -1,6 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import userRoutes from "./routes/user.js";
+import authRoutes from "./routes/auth.js";
 
 dotenv.config();
 
@@ -18,6 +20,10 @@ app.use(express.json());
 app.get("/", function (req, res, next) {
   return res.status(200).json({ msg: "working" });
 });
+
+app.use("/users", userRoutes);
+app.use("/auth", authRoutes);
+
 app.listen(process.env.PORT || 3001, () => {
   console.log("Server running on port 3001!");
 });
