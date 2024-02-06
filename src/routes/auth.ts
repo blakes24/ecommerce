@@ -1,5 +1,6 @@
 import { Router } from "express";
 import CryptoJS from "crypto-js";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const router = Router();
@@ -43,7 +44,14 @@ router.post("/login", async function (req, res, next) {
     if (hashedPass === password) {
       const userInfo = user.toObject();
       delete userInfo.password;
-      res.status(200).json(userInfo);
+
+      const accessToken = jwt.sign(
+        { id: user._id, isAdmin: user.isAdmin },
+        process.env.JWT_SECRET,
+        { expiresIn: "3d" }
+      );
+
+      res.status(200).json({ ...userInfo, accessToken });
     } else {
       res.status(401).json({ msg: "Invalid Password" });
     }
