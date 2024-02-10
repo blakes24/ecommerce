@@ -5,6 +5,7 @@ import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
 import statRoutes from "./routes/stats.js";
 import productRoutes from "./routes/product.js";
+import cartRoutes from "./routes/cart.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/stats", statRoutes);
 app.use("/products", productRoutes);
+app.use("/carts", cartRoutes);
 
 app.listen(process.env.PORT || 3001, () => {
   console.log("Server running on port 3001!");
