@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { verifyAdmin, verifyAndAuthorize, verifyToken } from "./verifyToken.js";
+import { verifyAdmin } from "./verifyToken.js";
 import User from "../models/User.js";
+import Order from "../models/Order.js";
 
 const router = Router();
 
@@ -26,6 +27,29 @@ router.get("/users", verifyAdmin, async function (req, res, next) {
     const total = await User.countDocuments();
 
     return res.status(200).json({ newUsersPerMonth: data, totalUsers: total });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// GET MONTHlY INCOME STATS
+router.get("/income", verifyAdmin, async function (req, res, next) {
+  const date = new Date();
+  const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
+  const prevMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
+  try {
+    const income = await Order.aggregate([
+      { $match: { createdAt: { $gte: prevMonth } } },
+      {
+        $project: {
+          month: { $month: "$createdAt" },
+          sales: "$amount",
+        },
+      },
+      { $group: { _id: "$month", total: { $sum: "$sales" } } },
+    ]);
+
+    return res.status(200).json(income);
   } catch (err) {
     res.status(500).json(err);
   }
